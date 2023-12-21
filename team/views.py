@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
+from player.models import Player
+from player.serializers import PlayerSerializer
 from team.models import Team
 from team.serializers import TeamSerializer
 
@@ -107,3 +109,71 @@ def get_team(request):
 
     serializer = TeamSerializer(team)
     return Response({'message': 'Team retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_mens_players_in_team(request):
+    """Get all men's players in a team.
+
+    Args:
+    request: A get request. The request must contain the id of the team whose players are to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of men's players in a team.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    players = Player.objects.filter(team=team, gender='M')
+    serializer = PlayerSerializer(players, many=True)
+    
+    if not serializer.data:
+        return Response({'message': 'No men\'s player in' + team.name}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({'message': 'Men\'s players in ' + team.name + ' retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_womens_players_in_team(request):
+    """Get all wommen's players in a team.
+
+    Args:
+    request: A get request. The request must contain the id of the team whose players are to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of women's players in a team.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    players = Player.objects.filter(team=team, gender='W')
+    serializer = PlayerSerializer(players, many=True)
+    
+    if not serializer.data:
+        return Response({'message': 'No women\'s player in' + team.name}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({'message': 'Women\'s players in ' + team.name + ' retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)

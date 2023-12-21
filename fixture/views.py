@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from fixture.models import Goal, Match, MatchDay, MatchEvent, Referee, Season
 
-from fixture.serializers import GoalSerializer, MatchDaySerializer, MatchEventSerializer, MatchEventWithGoalSerializer, MatchSerializer, RefereeSerializer, SeasonSerializer
+from fixture.serializers import GoalSerializer, MatchDaySerializer, MatchEventSerializer, MatchSerializer, RefereeSerializer, SeasonSerializer
 from player.models import Player
 from team.models import Team
 
@@ -107,6 +107,7 @@ def create_season(request):
     
     else:
         return Response({'message': 'Season creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+  
 
 
 @api_view(['GET'])
@@ -182,9 +183,9 @@ def update_season(request, id):
 
     if serializer.is_valid():
         serializer.save()
-        return Response({'message': 'Player updated successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Season updated successfully'}, status=status.HTTP_200_OK)
     else:
-        return Response({'message': 'Player update failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Season update failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     
     
@@ -501,6 +502,37 @@ def get_match(request):
     return Response({'message': 'Match retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
+@api_view(['PATCH'])
+def update_match(request, id):
+    """Update a match. Its argument is a JSON request which is deserialized into a Django model.
+
+    Args:
+    A JSON request. The request can contain any combination of the following fields:
+    home_team: The home team of the match.
+    away_team: The away team of the match.
+    match_day: The match day of the match.
+    match_time: The time of the match.
+    stage: The stage of the match.
+    referee: The referee of the match.
+    competition: The competition of the match.
+
+    Returns:
+    A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Match updated successfully' or 'Match update failed'.
+    """
+    try:
+        match = Match.objects.get(id=id)
+    except Match.DoesNotExist:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = MatchSerializer(match, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Match updated successfully'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'message': 'Match update failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+
 # MATCH EVENT VIEWS
 @api_view(['POST'])
 def create_goal(request):
@@ -565,14 +597,156 @@ def create_goal(request):
     goal = Goal.objects.create(match_event=match_event, scoring_team=scoring_team, assist_provider=assist_provider)
     
     # Update the match score
-    if scoring_team == match.home_team:
+    if scoring_team.id == match.home_team.id:
         match.home_team_score += 1
     else:
         match.away_team_score += 1
+        
+    match.save()
     
     return Response({'message': 'Goal created successfully'}, status=status.HTTP_201_CREATED)
     
         
         
+@api_view(['POST'])
+def create_red_card_event(request):
+    """Create a new red card event. Its argument is a JSON request which is deserialized into a django model.
+
+    Args:
+    A JSON request. The request must contain the following fields:
+    match: The match the red card was issued in.
+    player: The player who received the red card.
+    minute: The minute the red card was issued in.
     
-   
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Red card event created successfully' or 'Red card event creation failed'.
+    
+    """
+    
+    create_match_event(request, 'Red Card')
+
+
+@api_view(['POST'])
+def create_yellow_card_event(request):
+    """Create a new yellow card event. Its argument is a JSON request which is deserialized into a django model.
+
+    Args:
+    A JSON request. The request must contain the following fields:
+    match: The match the yellow card was issued in.
+    player: The player who received the yellow card.
+    minute: The minute the yellow card was issued in.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Yellow card event created successfully' or 'Yellow card event creation failed'.
+    
+    """
+    
+    create_match_event(request, 'Yellow Card')
+
+
+@api_view(['GET'])
+def get_match_events_in_match(request):
+    """Retrieve all match events. Its argument is a GET request.
+
+    Args:
+    A GET request.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of match events and a message. The message is either 'Match events retrieved successfully' or 'No match events found'.
+    """
+    
+    match_id = request.query_params.get('match_id')
+
+    if not match_id:
+        return Response({'message': 'Match ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match_id = int(match_id)
+    except ValueError:
+        return Response({'message': 'Invalid Match ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    match_events = MatchEvent.objects.filter(match=match)
+    serializer = MatchEventSerializer(match_events, many=True)
+    return Response({'match_events': serializer.data, 'message': 'Match events retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_goals_in_match(request):
+    """Retrieve all goals in a match. Its argument is a GET request.
+
+    Args:
+    A GET request.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of goals and a message. The message is either 'Goals retrieved successfully' or 'No goals found'.
+    """
+    
+    match_id = request.query_params.get('match_id')
+
+    if not match_id:
+        return Response({'message': 'Match ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match_id = int(match_id)
+    except ValueError:
+        return Response({'message': 'Invalid Match ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    goals = Goal.objects.filter(match_event__match=match)
+    serializer = GoalSerializer(goals, many=True)
+    return Response({'goals': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+
+# HELPER FUNCTIONS
+def create_match_event(request, event_type):
+    """Create a new match event. Its argument is a JSON request which is deserialized into a django model. This is a generic function that is used by the create_red_card_event and create_yellow_card_event functions.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    match: The match the event occurred in.
+    player: The player who was involved in the event.
+    minute: The minute the event occurred in.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either '<event_type> event created successfully' or '<event_type> event creation failed'.
+    
+    """
+    
+    data = request.data
+    
+    if not data.get('match') or not data.get('player') or not data.get('minute'):
+        return Response({'message': 'Match, player and minute are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    player = data.get('player')
+    match = data.get('match')
+    minute = data.get('minute')
+    
+    # obtain the match and player objects
+    match = Match.objects.get(id=match)
+    player = Player.objects.get(id=player)
+    
+    if not match:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not player:
+        return Response({'message': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not match.has_started:
+        return Response({'message': 'Match has not started yet'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if match.has_ended:
+        return Response({'message': 'Match has ended'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type=event_type)
+    
+    return Response({'message': event_type + ' event created successfully'}, status=status.HTTP_201_CREATED)
