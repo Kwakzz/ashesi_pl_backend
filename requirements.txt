@@ -1,0 +1,8 @@
+django-rest-framework
+django
+paystack
+pymysql
+firebase-admin
+Pillow
+corsheaders
+```

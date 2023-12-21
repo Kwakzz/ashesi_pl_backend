@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Activate Your APL Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        /* Add more styles as needed */
+        .logo {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Activate Your APL Account</h2>
+        <img class="logo" src="{{ MEDIA_URL }}apl.png" alt="APL Logo">
+        <p>Click the following link to activate your account:</p>
+        <a href="{{ activation_link }}">{{ activation_link }}</a>
+    </div>
+</body>
+</html>
