@@ -109,7 +109,7 @@ def get_players(request):
     
     players = Player.objects.all()
     serializer = PlayerSerializer(players, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({'data': serializer.data, 'message': 'Players retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])

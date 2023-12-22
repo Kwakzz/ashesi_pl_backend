@@ -48,7 +48,7 @@ def get_referees(request):
     
     if referees:
         serializer = RefereeSerializer(referees, many=True)
-        return Response({'referees': serializer.data, 'message': 'Referees retrieved successfully'}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'message': 'Referees retrieved successfully'}, status=status.HTTP_200_OK)
     
     else:
         return Response({'message': 'No referees found'}, status=status.HTTP_404_NOT_FOUND)
@@ -322,7 +322,8 @@ def get_season_match_days(request):
 
     match_days = MatchDay.objects.filter(season=season)
     match_day_serializer = MatchDaySerializer(match_days, many=True)
-    return Response({'season': SeasonSerializer(season).data, 'match_days': match_day_serializer.data, 'message': 'Match days retrieved successfully'}, status=status.HTTP_200_OK)
+    # return Response({'season': SeasonSerializer(season).data, 'match_days': match_day_serializer.data, 'message': 'Match days retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': match_day_serializer.data, 'message': 'Match days retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -354,7 +355,8 @@ def get_match_day_matches(request):
 
     matches = Match.objects.filter(match_day=match_day)
     serializer = MatchSerializer(matches, many=True)
-    return Response({'match_day': MatchDaySerializer(match_day).data, 'matches': serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    # return Response({'match_day': MatchDaySerializer(match_day).data, 'matches': serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -387,7 +389,8 @@ def get_season_fixtures(request):
     match_days = MatchDay.objects.filter(season=season)
     matches = Match.objects.filter(match_day__in=match_days, has_ended=False)
     match_serializer = MatchSerializer(matches, many=True)
-    return Response({'season': SeasonSerializer(season).data, 'matches': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    # return Response({'season': SeasonSerializer(season).data, 'matches': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -420,7 +423,8 @@ def get_season_results(request):
     match_days = MatchDay.objects.filter(season=season)
     matches = Match.objects.filter(match_day__in=match_days, has_ended=True)
     match_serializer = MatchSerializer(matches, many=True)
-    return Response({'season': SeasonSerializer(season).data, 'matches': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    # return Response({'season': SeasonSerializer(season).data, 'matches': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 
@@ -466,7 +470,7 @@ def get_matches(request):
     
     if matches:
         serializer = MatchSerializer(matches, many=True)
-        return Response({'matches': serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
     
     else:
         return Response({'message': 'No matches found'}, status=status.HTTP_404_NOT_FOUND)
@@ -672,7 +676,7 @@ def get_match_events_in_match(request):
 
     match_events = MatchEvent.objects.filter(match=match)
     serializer = MatchEventSerializer(match_events, many=True)
-    return Response({'match_events': serializer.data, 'message': 'Match events retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': serializer.data, 'message': 'Match events retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -703,7 +707,7 @@ def get_goals_in_match(request):
 
     goals = Goal.objects.filter(match_event__match=match)
     serializer = GoalSerializer(goals, many=True)
-    return Response({'goals': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
+    return Response({'data': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 
