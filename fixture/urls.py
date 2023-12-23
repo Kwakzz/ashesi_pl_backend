@@ -12,7 +12,7 @@ urlpatterns = [
     path('season/get', get_season, name='get_season'),
     path('season/update/<int:id>/', update_season, name='update_season'),
     path('season/match_days/get', get_season_match_days, name='get_season_match_days'),
-    path('season/fixtures/get', get_season_fixtures, name='get_season_fixtures'),
+    path('season/fixtures/get/', get_season_fixtures, name='get_season_fixtures'),
     path('season/results/get', get_season_results, name='get_season_results'),
     
     path('match_day/create/', create_match_day, name='create_match_day'),

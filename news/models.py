@@ -20,7 +20,13 @@ class NewsItemTag(models.Model):
         ('Feature', 'Feature'),
         ('Tactical Analysis', 'Tactical Analysis'),
         ('Presser', 'Press Conference'),
-        ('Other', 'Other')
+        ('Other', 'Other'),
+        ('Kasanoma', 'Kasanoma'),
+        ('Northside', 'Northside'),
+        ('Red Army', 'Red Army'),
+        ('Legends United', 'Legends United'),
+        ('Highlanders', 'Highlanders'),
+        ('Elite', 'Elite'),
     ]
     
     name = models.CharField(max_length=200, null=False, blank=False, choices=TAG_CHOICES, unique=True)
@@ -43,6 +49,12 @@ DEFAULT_TAGS = [
     'Tactical Analysis',
     'Presser',
     'Other',
+    'Kasanoma',
+    'Northside',
+    'Red Army',
+    'Legends United',
+    'Highlanders',
+    'Elite'
 ]
 
 # Signal handler to create default tags after migration

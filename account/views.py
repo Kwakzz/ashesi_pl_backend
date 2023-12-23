@@ -197,7 +197,10 @@ def activate_account(request):
         user = Fan.objects.get(id=uid)
         token = Token.objects.get(user=user)
         
-        if token.key == data.get('token'):
+        if user.is_active:
+            return Response({'message': 'Account already activated'}, status=status.HTTP_200_OK)
+        
+        if token.key == data.get('token') and not user.is_active:
             user.is_active = True
             user.save()
             return Response({'message': 'Account activated successfully'}, status=status.HTTP_200_OK)

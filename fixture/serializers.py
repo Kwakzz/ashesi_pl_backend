@@ -35,6 +35,7 @@ class SeasonSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'start_date': 'Start date cannot be before today.'})
 
         return data
+
             
 class CompetitionSerializer(serializers.ModelSerializer):
                 
@@ -45,7 +46,8 @@ class CompetitionSerializer(serializers.ModelSerializer):
             
 class MatchDaySerializer(serializers.ModelSerializer):
     
-    # ensure match day date is within the season's start and end dates
+    # ensure match day date is within the season's start and end dates.
+    
     def validate(self, data):
         season = data.get('season')
         date = data.get('date')
@@ -59,6 +61,9 @@ class MatchDaySerializer(serializers.ModelSerializer):
             
         return data
     
+    
+    
+                
     class Meta:
         model = MatchDay
         fields = '__all__'

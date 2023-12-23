@@ -125,7 +125,7 @@ def get_seasons(request):
     
     if seasons:
         serializer = SeasonSerializer(seasons, many=True)
-        return Response({'seasons': serializer.data, 'message': 'Seasons retrieved successfully'}, status=status.HTTP_200_OK)
+        return Response({'data': serializer.data, 'message': 'Seasons retrieved successfully'}, status=status.HTTP_200_OK)
     
     else:
         return Response({'message': 'No seasons found'}, status=status.HTTP_404_NOT_FOUND)
@@ -361,7 +361,7 @@ def get_match_day_matches(request):
 
 @api_view(['GET'])
 def get_season_fixtures(request):
-    """Retrieve all fixtures (unplayed matches) of a season. Its argument is a GET request.
+    """Retrieve all fixtures (unplayed matches) of the current season. Its argument is a GET request.
 
     Args:
     A GET request. The request must contain the following fields:
@@ -371,7 +371,8 @@ def get_season_fixtures(request):
         A response object containing a JSON object and a status code. The JSON object contains a list of matches and a message. The message is either 'Matches retrieved successfully' or 'No matches found'.
     """
 
-    season_id = request.query_params.get('season_id')
+    latest_season = Season.objects.latest('id')
+    season_id = latest_season.id
 
     if not season_id:
         return Response({'message': 'Season ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -627,7 +628,7 @@ def create_red_card_event(request):
     
     """
     
-    create_match_event(request, 'Red Card')
+    return create_match_event(request, 'Red Card')
 
 
 @api_view(['POST'])
@@ -645,7 +646,7 @@ def create_yellow_card_event(request):
     
     """
     
-    create_match_event(request, 'Yellow Card')
+    return create_match_event(request, 'Yellow Card')
 
 
 @api_view(['GET'])

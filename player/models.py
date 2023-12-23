@@ -54,7 +54,7 @@ class Player(models.Model):
     is_active = models.BooleanField(default=True)
     team = models.ForeignKey('team.Team', on_delete=models.SET_DEFAULT, related_name='players', null=True, blank=True, default=None)
     position = models.ForeignKey(PlayerPosition, on_delete=models.SET_DEFAULT, related_name='players', null=True, blank=True, default=None)
-    image = models.CharField(max_length=250, null=True, blank=True, default=None)
+    image = models.URLField(max_length=250, null=True, blank=True, default=None)
 
     
     def __str__(self):

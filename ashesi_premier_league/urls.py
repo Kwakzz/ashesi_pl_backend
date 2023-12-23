@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('player.urls')),
     path('', include('news.urls')),
     path('', include('fixture.urls')),
+    path('', include('stats.urls')),
 ]

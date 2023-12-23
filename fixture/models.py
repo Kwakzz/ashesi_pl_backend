@@ -114,7 +114,7 @@ class Match (models.Model):
         return self.home_team.name + " vs " + self.away_team.name + " (" + self.competition.name + ")"
     
     class Meta:
-        ordering = ['match_time']
+        ordering = ['match_day']
         
         
 class MatchEvent(models.Model):
