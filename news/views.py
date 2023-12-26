@@ -119,7 +119,7 @@ def get_news_items(request):
     
     news_items = NewsItem.objects.all()
     serializer = NewsItemSerializer(news_items, many=True)
-    return Response({'message': 'News items retrieved successfully', 'news_items': serializer.data}, status=status.HTTP_200_OK)
+    return Response({'message': 'News items retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -148,4 +148,4 @@ def get_news_item(request):
         return Response({'message': 'News item not found'}, status=status.HTTP_404_NOT_FOUND)
 
     serializer = NewsItemSerializer(news_item)
-    return Response({'message': 'News item retrieved successfully', 'news_item': serializer.data}, status=status.HTTP_200_OK)
+    return Response({'message': 'News item retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)

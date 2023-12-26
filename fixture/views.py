@@ -597,6 +597,18 @@ def create_goal(request):
     if player == assist_provider:
         return Response({'message': 'Player and assist provider cannot be the same'}, status=status.HTTP_400_BAD_REQUEST)
     
+    if assist_provider and assist_provider.team != match.home_team and assist_provider.team != match.away_team:
+        return Response({'message': 'Assist provider is not playing for the scoring team'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if player.team != match.home_team and player.team != match.away_team:
+        return Response({'message': 'Player is not playing for the scoring team'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if player.gender != match.competition.gender:
+        return Response({'message': 'Player is not playing in the competition'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if scoring_team != match.home_team and scoring_team != match.away_team:
+        return Response({'message': 'Scoring team is not playing in the match'}, status=status.HTTP_400_BAD_REQUEST)
+    
     match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type='Goal')
     
     goal = Goal.objects.create(match_event=match_event, scoring_team=scoring_team, assist_provider=assist_provider)
@@ -751,6 +763,12 @@ def create_match_event(request, event_type):
     
     if match.has_ended:
         return Response({'message': 'Match has ended'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if player.team != match.home_team and player.team != match.away_team:
+        return Response({'message': 'Player is not playing in the match'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if player.gender != match.competition.gender:
+        return Response({'message': 'Player is not playing in the competition'}, status=status.HTTP_400_BAD_REQUEST)
     
     match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type=event_type)
     

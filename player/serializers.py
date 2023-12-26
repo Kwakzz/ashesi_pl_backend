@@ -5,7 +5,7 @@ from team.models import Team
 from team.serializers import TeamSerializer
 import re
 from django.utils import timezone
-
+year_group_pattern = re.compile(r'^\d{4}$')
 
 class PlayerPositionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +13,6 @@ class PlayerPositionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-year_group_pattern = re.compile(r'^\d{4}$')
 
 class PlayerSerializer(serializers.ModelSerializer):
     year_group = serializers.CharField(validators=[lambda x: year_group_pattern.match(x) is not None])

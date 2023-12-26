@@ -69,8 +69,8 @@ class Coach(models.Model):
     ]
     
     id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=100, null=False, blank=False, default=None)
-    last_name = models.CharField(max_length=100, null=False, blank=False, default=None)
+    first_name = models.CharField(max_length=100, default=None)
+    last_name = models.CharField(max_length=100, default=None)
     team = models.ForeignKey('team.Team', on_delete=models.SET_DEFAULT, related_name='coaches', null=True, blank=True, default=None)
     is_active = models.BooleanField(default=True)
-    gender = models.CharField(max_length = 1, choices = GENDER_CHOICES, null=False, blank=False, default=None)
+    gender = models.CharField(max_length = 1, choices = GENDER_CHOICES)
