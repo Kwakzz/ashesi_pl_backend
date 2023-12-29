@@ -43,7 +43,7 @@ class CoachSerializer(serializers.ModelSerializer):
         
         
     def to_representation(self, instance):
-        # When retrieving coach player, include the team associated with the coach.
+        # When retrieving coach, include the team associated with the coach.
         representation = super().to_representation(instance)
         representation['team'] = TeamSerializer(instance.team).data
         return representation
