@@ -1,5 +1,5 @@
 from fixture.models import Goal
-from player.models import Player, PlayerPosition
+from player.models import Player, PlayerPosition, Coach
 from rest_framework import serializers
 from team.models import Team
 from team.serializers import TeamSerializer
@@ -32,4 +32,18 @@ class PlayerSerializer(serializers.ModelSerializer):
         # get no of goals scored in history
         goals = Goal.objects.filter(match_event__player=instance)
         representation['no_of_goals_in_history'] = len(goals)
+        return representation
+    
+    
+class CoachSerializer(serializers.ModelSerializer):
+        
+    class Meta:
+        model = Coach
+        fields = '__all__'
+        
+        
+    def to_representation(self, instance):
+        # When retrieving coach player, include the team associated with the coach.
+        representation = super().to_representation(instance)
+        representation['team'] = TeamSerializer(instance.team).data
         return representation

@@ -1,5 +1,5 @@
 from django.urls import path
-from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, get_latest_results, create_match, get_matches, get_match, update_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_goals_in_match
+from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, get_latest_results, create_match, get_matches, get_match, update_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_team_match_events, get_goals_in_match, get_goals_in_match_by_team
 
 
 urlpatterns = [
@@ -31,7 +31,9 @@ urlpatterns = [
     path('match_event/yellow_card/create/', create_yellow_card_event, name='create_yellow_card_event'),
     path('match_event/red_card/create/', create_red_card_event, name='create_red_card_event'),
     path('match_event/get', get_match_events_in_match, name='get_match_events_in_match'),
+    path('match_event/team/get', get_team_match_events, name='get_team_match_events'),
     path('goal/get', get_goals_in_match, name='get_goals_in_match'),
+    path('goal/get_by_team', get_goals_in_match_by_team, name='get_goals_in_match_by_team'),
     
     
     

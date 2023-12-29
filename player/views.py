@@ -43,7 +43,7 @@ def create_player(request):
     position: The position of the player. This is a foreign key to the PlayerPosition model.
     gender: It's either M or W. M represents Men, and W, Women.
     year_group: The year group of the player.
-    is_active: A boolean value indicating whether the player is active or not.
+    is_active: A boolean value indicating whether the player is active or not (Optional. Default value is true).
     team: The team the player belongs to. This is a foreign key to the Team model.
     
     
@@ -139,3 +139,111 @@ def get_player(request):
 
     serializer = PlayerSerializer(player)
     return Response({'message': 'Player retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+# COACHES
+from player.models import Coach
+from player.serializers import CoachSerializer
+
+@api_view(['POST'])
+def create_coach(request):
+    
+    """Create a coach. Its argument is a JSON request which is deserialized into a django model.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    first_name: The first name of the coach.
+    last_name: The last name of the coach.
+    gender: It's either M or W. M represents Men, and W, Women.
+    team: The team the coach belongs to. This is a foreign key to the Team model.
+    
+    
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Coach created successfully' or 'Coach creation failed'.
+    """
+    
+    serializer = CoachSerializer(data=request.data)
+        
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Coach created successfully'}, status=status.HTTP_201_CREATED)
+    
+    else:
+        return Response({'message': 'Coach creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PATCH'])
+def update_coach(request, id):
+    """Update a coach. Its argument is a JSON request which is deserialized into a Django model.
+
+    Args:
+    A JSON request. The request can contain any combination of the following fields:
+    first_name: The first name of the coach.
+    last_name: The last name of the coach.
+    year_group: The year group of the coach.
+    is_active: A boolean value indicating whether the coach is active or not.
+    team: The team the coach belongs to. This is a foreign key to the Team model.
+
+    Returns:
+    A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any.
+    The message is either 'Coach updated successfully' or 'Coach update failed'.
+    """
+    try:
+        coach = Coach.objects.get(id=id)
+    except Coach.DoesNotExist:
+        return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = CoachSerializer(coach, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'message': 'Coach updated successfully'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'message': 'Coach update failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+    
+@api_view(['GET'])
+def get_coaches(request):
+    """Get all coaches.
+    
+    Args:
+    None.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of coaches.
+    """
+    
+    players = Coach.objects.all()
+    serializer = CoachSerializer(players, many=True)
+    return Response({'data': serializer.data, 'message': 'Coaches retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_coach(request):
+    """Get a coach.
+
+    Args:
+    request: A get request. The request must contain the id of the coach to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and the coach.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Coach ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Coach ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        coach = Coach.objects.get(id=id)
+    except Coach.DoesNotExist:
+        return Response({'message': 'Coach not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = CoachSerializer(coach)
+    return Response({'message': 'Coach retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)

@@ -727,6 +727,43 @@ def get_match_events_in_match(request):
 
 
 @api_view(['GET'])
+def get_team_match_events(request):
+    
+    match_id = request.query_params.get('match_id')
+    team_id = request.query_params.get('team_id')
+    
+    if not match_id:
+        return Response({'message': 'Match ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not team_id:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        match_id = int(match_id)
+    except ValueError:
+        return Response({'message': 'Invalid Match ID'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        team_id = int(team_id)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        match = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        team = Team.objects.get(id=team_id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    match_events = MatchEvent.objects.filter(match=match, player__team=team)
+    serializer = MatchEventSerializer(match_events, many=True)
+    return Response({'data': serializer.data, 'message': 'Match events retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def get_goals_in_match(request):
     """Retrieve all goals in a match. Its argument is a GET request.
 
@@ -753,6 +790,52 @@ def get_goals_in_match(request):
         return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
 
     goals = Goal.objects.filter(match_event__match=match)
+    serializer = GoalSerializer(goals, many=True)
+    return Response({'data': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_goals_in_match_by_team(request):
+    """Retrieve all goals in a match by a team. Its argument is a GET request.
+
+    Args:
+    A GET request. The request must contain the following fields:
+    match_id: The id of the match.
+    team_id: The id of the team.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of goals and a message. The message is either 'Goals retrieved successfully' or 'No goals found'.
+    """
+
+    match_id = request.query_params.get('match_id')
+    team_id = request.query_params.get('team_id')
+
+    if not match_id:
+        return Response({'message': 'Match ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not team_id:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match_id = int(match_id)
+    except ValueError:
+        return Response({'message': 'Invalid Match ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team_id = int(team_id)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        team = Team.objects.get(id=team_id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    goals = Goal.objects.filter(match_event__match=match, scoring_team=team)
     serializer = GoalSerializer(goals, many=True)
     return Response({'data': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
 
