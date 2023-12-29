@@ -18,6 +18,9 @@ class StandingsSerializer(serializers.ModelSerializer):
         representation['competition'] = CompetitionSerializer(instance.competition).data
         
         standings_teams = StandingsTeam.objects.filter(standings=instance)
+        
+        # sort the standings teams by points, goal difference, goals for, and team name
+        standings_teams = sorted(standings_teams, key=lambda x: (x.points, x.goal_difference, x.goals_for, x.team.name), reverse=True)
         representation['standings_teams'] = StandingsTeamSerializer(standings_teams, many=True).data
         return representation
     
@@ -26,6 +29,7 @@ class StandingsTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = StandingsTeam
         fields = '__all__'
+        
         
     def to_representation(self, instance):
         # When retrieving a standings team, include the team associated with the standings team.

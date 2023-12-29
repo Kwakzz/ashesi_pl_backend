@@ -21,6 +21,7 @@ class NewsItemSerializer(serializers.ModelSerializer):
         # When retrieving a news item, include the tag associated with the news item.
         representation = super().to_representation(instance)
         representation['tag'] = NewsItemTagSerializer(instance.tag).data
+        representation['author'] = FanSerializer(instance.author).data
         return representation
     
     def strip_html_tags(self, value):

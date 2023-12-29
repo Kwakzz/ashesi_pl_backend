@@ -1,5 +1,5 @@
 from django.urls import path
-from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, create_match, get_matches, get_match, update_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_goals_in_match
+from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, get_latest_results, create_match, get_matches, get_match, update_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_goals_in_match
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('season/match_days/get', get_season_match_days, name='get_season_match_days'),
     path('season/fixtures/get/', get_season_fixtures, name='get_season_fixtures'),
     path('season/results/get', get_season_results, name='get_season_results'),
+    path('season/results/latest/get/', get_latest_results, name='get_latest_results'),
     
     path('match_day/create/', create_match_day, name='create_match_day'),
     path('match_day/get/', get_match_days, name='get_match_days'),

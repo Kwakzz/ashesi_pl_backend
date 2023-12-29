@@ -395,6 +395,40 @@ def get_season_fixtures(request):
 
 
 @api_view(['GET'])
+def get_latest_results(request):
+    """Retrieve the latest results (played matches) of the current season. Its argument is a GET request. The latest results are the results of the latest match day.
+
+    Args:
+    A GET request. The request must contain the following fields:
+    season_id: The id of the season.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of matches and a message. The message is either 'Matches retrieved successfully' or 'No matches found'.
+    """
+
+    latest_season = Season.objects.get(id=1)
+    season_id = latest_season.id
+
+    if not season_id:
+        return Response({'message': 'Season ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        season_id = int(season_id)
+    except ValueError:
+        return Response({'message': 'Invalid Season ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        season = Season.objects.get(id=season_id)
+    except Season.DoesNotExist:
+        return Response({'message': 'Season not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    match_days = MatchDay.objects.filter(season=season)
+    matches = Match.objects.filter(match_day__in=match_days, has_ended=True).order_by('-match_day__date')
+    match_serializer = MatchSerializer(matches, many=True)
+    return Response({'data': match_serializer.data, 'message': 'Matches retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
 def get_season_results(request):
     """Retrieve all results (played matches) of a season. Its argument is a GET request.
 
