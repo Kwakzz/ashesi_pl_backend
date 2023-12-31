@@ -1,5 +1,5 @@
 from django.urls import path
-from team.views import create_team, update_team, get_teams, get_team, get_mens_players_in_team, get_womens_players_in_team
+from team.views import create_team, update_team, get_teams, get_team, get_mens_players_in_team, get_womens_players_in_team, get_team_stats
 
 
 urlpatterns = [
@@ -9,4 +9,5 @@ urlpatterns = [
     path('team/get', get_team, name='get_team'),
     path('team/mens_players/get', get_mens_players_in_team, name='get_mens_players_in_team'),
     path('team/womens_players/get', get_womens_players_in_team, name='get_womens_players_in_team'),
+    path('team/stats/get', get_team_stats, name='get_team_stats')
 ]
