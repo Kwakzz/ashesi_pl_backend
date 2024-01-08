@@ -4,9 +4,9 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from fixture.models import Goal, Match, MatchDay, MatchEvent, Referee, Season
+from fixture.models import Competition, Goal, Match, MatchDay, MatchEvent, Referee, Season, Stage
 
-from fixture.serializers import GoalSerializer, MatchDaySerializer, MatchEventSerializer, MatchSerializer, RefereeSerializer, SeasonSerializer
+from fixture.serializers import CompetitionSerializer, GoalSerializer, MatchDaySerializer, MatchEventSerializer, MatchSerializer, RefereeSerializer, SeasonSerializer, StageSerializer
 from player.models import Player
 from team.models import Team
 
@@ -838,6 +838,50 @@ def get_goals_in_match_by_team(request):
     goals = Goal.objects.filter(match_event__match=match, scoring_team=team)
     serializer = GoalSerializer(goals, many=True)
     return Response({'data': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
+
+
+# COMPETITIONS
+@api_view(['GET'])
+def get_competitions(request):
+    """Retrieve all competitions. Its argument is a GET request.
+
+    Args:
+    A GET request.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of competitions and a message. The message is either 'Competitions retrieved successfully' or 'No referees found'.
+    """
+    
+    competitions = Competition.objects.all()
+    
+    if competitions:
+        serializer = CompetitionSerializer(competitions, many=True)
+        return Response({'data': serializer.data, 'message': 'Competitions retrieved successfully'}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({'message': 'No competitions found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+# STAGES
+@api_view(['GET'])
+def get_stages(request):
+    """Retrieve all stages. Its argument is a GET request.
+
+    Args:
+    A GET request.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of stages and a message. The message is either 'Stages retrieved successfully' or 'No stages found'.
+    """
+    
+    stages = Stage.objects.all()
+    
+    if stages:
+        serializer = StageSerializer(stages, many=True)
+        return Response({'data': serializer.data, 'message': 'Stages retrieved successfully'}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({'message': 'No stages found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 

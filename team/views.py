@@ -80,10 +80,28 @@ def get_teams(request):
     Returns:
         A response object containing a JSON object and a status code. The JSON object contains a message and a list of teams.
     """
+        
+    womens_teams = Team.objects.filter(
+        Q(players__gender='W') & ~Q(players=None)
+    ).distinct()
     
-    teams = Team.objects.all()
-    serializer = TeamSerializer(teams, many=True)
-    return Response({'message': 'Teams retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
+    teams = []
+    
+    for team in Team.objects.all():
+        team = {
+            'id': team.id,
+            'name': team.name,
+            'name_abbreviation': team.name_abbreviation,
+            'logo_url': team.logo_url,
+            'cover_photo_url': team.cover_photo_url,
+            'color': team.color,
+            'twitter_url': team.twitter_url,
+            'has_womens_team': team in womens_teams,
+        }
+        
+        teams.append(team)
+    
+    return Response({'message': 'Teams retrieved successfully', 'data': teams}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -182,6 +200,124 @@ def get_womens_players_in_team(request):
     
     return Response({'message': 'Women\'s players in ' + team.name + ' retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+def get_mens_team_stats(request):
+    """Get a men's team's stats.
+
+    Args:
+    request: A get request. The request must contain the id of the team whose stats are to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and the team's stats.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    team_stats = {
+        'wins': get_team_no_of_wins_by_gender(id, 'M'),
+        'losses': get_team_no_of_losses_by_gender(id, 'M'),
+        'draws': get_no_of_matches_played_by_gender(id, 'M') - get_team_no_of_wins_by_gender(id, 'M') - get_team_no_of_losses_by_gender(id, 'M'),
+        'goals_scored': get_team_no_of_goals_scored_by_gender(id, 'M'),
+        'goals_conceded': get_team_no_of_goals_conceded_by_gender(id, 'M'),
+        'matches_played': get_no_of_matches_played_by_gender(id, 'M'),
+    }
+
+    return Response({'message': 'Men\'s team stats retrieved successfully', 'data': team_stats}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_womens_team_stats(request):
+    """Get a women's team's stats.
+
+    Args:
+    request: A get request. The request must contain the id of the team whose stats are to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and the team's stats.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    team_stats = {
+        'wins': get_team_no_of_wins_by_gender(id, 'W'),
+        'losses': get_team_no_of_losses_by_gender(id, 'W'),
+        'draws': get_no_of_matches_played_by_gender(id, 'W') - get_team_no_of_wins_by_gender(id, 'W') - get_team_no_of_losses_by_gender(id, 'W'),
+        'goals_scored': get_team_no_of_goals_scored_by_gender(id, 'W'),
+        'goals_conceded': get_team_no_of_goals_conceded_by_gender(id, 'W'),
+        'matches_played': get_no_of_matches_played_by_gender(id, 'W'),
+    }
+
+    return Response({'message': 'Women\'s team stats retrieved successfully', 'data': team_stats}, status=status.HTTP_200_OK)
+    
+
+
+
+@api_view(['GET'])
+def get_team_stats(request):
+    """Get a team's stats.
+
+    Args:
+    request: A get request. The request must contain the id of the team whose stats are to be retrieved.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and the team's stats.
+    """
+    id_param = request.query_params.get('id')
+
+    if not id_param:
+        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        id = int(id_param)
+    except ValueError:
+        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        team = Team.objects.get(id=id)
+    except Team.DoesNotExist:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    team_stats = {
+        'wins': get_team_no_of_wins(id),
+        'losses': get_team_no_of_losses(id),
+        'draws': get_no_of_matches_played(id) - get_team_no_of_wins(id) - get_team_no_of_losses(id),
+        'goals_scored': get_team_no_of_goals_scored(id),
+        'goals_conceded': get_team_no_of_goals_conceded(id),
+        'matches_played': get_no_of_matches_played(id),
+    }
+
+    return Response({'message': 'Team stats retrieved successfully', 'data': team_stats}, status=status.HTTP_200_OK)
+
+
+
+
+
+# HELPER FUNCTIONS
 
 def get_team_no_of_wins(team_id):
     """Get the number of matches won by a team.
@@ -289,38 +425,119 @@ def get_no_of_matches_played(team_id):
     return matches_played
 
 
-@api_view(['GET'])
-def get_team_stats(request):
-    """Get a team's stats.
+# BY GENDER
+
+def get_team_no_of_wins_by_gender(team_id, gender):
+    """Get the number of matches won by a team (by gender).
 
     Args:
-    request: A get request. The request must contain the id of the team whose stats are to be retrieved.
+        team_id: The id of the team whose number of matches lost is to be retrieved.
+        gender: The gender of the team whose number of matches lost is to be retrieved.
 
     Returns:
-        A response object containing a JSON object and a status code. The JSON object contains a message and the team's stats.
+        The number of matches won by a team.
     """
-    id_param = request.query_params.get('id')
+    
+    team = Team.objects.get(id=team_id)
 
-    if not id_param:
-        return Response({'message': 'Team ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+    matches_won = Match.objects.filter(
+        Q(home_team=team, home_team_score__gt=F('away_team_score'), competition__gender=gender) |
+        Q(away_team=team, away_team_score__gt=F('home_team_score'), competition__gender=gender)
+    ).count()
 
-    try:
-        id = int(id_param)
-    except ValueError:
-        return Response({'message': 'Invalid Team ID'}, status=status.HTTP_400_BAD_REQUEST)
+    return matches_won
 
-    try:
-        team = Team.objects.get(id=id)
-    except Team.DoesNotExist:
-        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    team_stats = {
-        'wins': get_team_no_of_wins(id),
-        'losses': get_team_no_of_losses(id),
-        'draws': get_no_of_matches_played(id) - get_team_no_of_wins(id) - get_team_no_of_losses(id),
-        'goals_scored': get_team_no_of_goals_scored(id),
-        'goals_conceded': get_team_no_of_goals_conceded(id),
-        'matches_played': get_no_of_matches_played(id),
-    }
+def get_team_no_of_losses_by_gender(team_id, gender):
+    """Get the number of matches lost by a team.
 
-    return Response({'message': 'Team stats retrieved successfully', 'data': team_stats}, status=status.HTTP_200_OK)
+    Args:
+        team_id: The id of the team whose number of matches lost is to be retrieved.
+        gender: The gender of the team whose number of matches lost is to be retrieved.
+
+    Returns:
+        The number of matches lost by a team.
+    """
+    
+    team = Team.objects.get(id=team_id)
+
+    matches_lost = Match.objects.filter(
+        Q(home_team=team, home_team_score__lt=F('away_team_score'), competition__gender=gender) |
+        Q(away_team=team, away_team_score__lt=F('home_team_score'), competition__gender=gender)
+    ).count()
+
+    return matches_lost
+
+
+def get_team_no_of_goals_scored_by_gender(team_id, gender):
+    """Get the number of goals scored by a team (by gender).
+
+    Args:
+        team_id: The id of the team whose number of goals scored is to be retrieved.
+        gender: The gender of the team whose number of goals scored is to be retrieved.
+
+    Returns:
+        The number of goals scored by a team.
+    """
+    
+    team = Team.objects.get(id=team_id)
+
+    no_of_goals_scored = Goal.objects.filter(
+        Q(scoring_team=team) &
+        Q(match_event__match__competition__gender=gender)
+    ).count()
+
+    return no_of_goals_scored
+
+
+def get_team_no_of_goals_conceded_by_gender(team_id, gender):
+    """Get the number of goals conceded by a team.
+
+    Args:
+        team_id: The id of the team whose number of goals conceded is to be retrieved.
+        gender: The gender of the team whose number of goals conceded is to be retrieved.
+
+    Returns:
+        The number of goals conceded by a team.
+    """
+    
+    team = Team.objects.get(id=team_id)
+
+    # Get the sum of away team score when the home team is the given team
+    away_goals_conceded = Match.objects.filter(
+        Q(home_team=team) &
+        Q(competition__gender = gender)
+    ).aggregate(Sum('away_team_score'))['away_team_score__sum'] or 0
+
+    # Get the sum of home team score when the away team is the given team
+    home_goals_conceded = Match.objects.filter(
+        Q(away_team=team)&
+        Q(competition__gender = gender)
+    ).aggregate(Sum('home_team_score'))['home_team_score__sum'] or 0
+
+    # Calculate the total goals conceded
+    total_goals_conceded = away_goals_conceded + home_goals_conceded
+    
+
+    return total_goals_conceded or 0
+
+
+def get_no_of_matches_played_by_gender(team_id, gender):
+    """Get the number of matches played by a team (by gender).
+
+    Args:
+        team_id: The id of the team whose number of matches played is to be retrieved.
+        gender: The gender of the team whose number of matches played is to be retrieved.
+
+    Returns:
+        The number of matches played by a team.
+    """
+    
+    team = Team.objects.get(id=team_id)
+
+    matches_played = Match.objects.filter(
+        Q(home_team=team, competition__gender=gender) |
+        Q(away_team=team, competition__gender=gender)
+    ).count()
+
+    return matches_played

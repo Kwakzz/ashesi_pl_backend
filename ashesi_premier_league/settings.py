@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
     'rest_framework',
     'rest_framework.authtoken',
     'account.apps.AccountConfig',
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'ashesi_premier_league.urls'
@@ -88,10 +90,11 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost',
-)
+CORS_ALLOW_ALL = True
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:60104',
+]
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -178,5 +181,14 @@ MEDIA_URL = "/media/"
 
 AUTH_USER_MODEL = 'account.Fan'
 
-
 BACKEND_URL = 'localhost:8000'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dvghxq3ba',
+    'API_KEY': '758874648176679',
+    'API_SECRET': '427xuqTdqBtXIEt1RgmxpSkR6Qg',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CLOUDINARY_NEWS_IMAGE_FOLDER = 'News Cover Pics'
+CLOUDINARY_PLAYER_IMAGE_FOLDER = "Player Images"

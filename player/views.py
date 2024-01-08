@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from player.models import Player, PlayerPosition
 from player.serializers import PlayerSerializer, PlayerPositionSerializer
+from cloudinary.uploader import upload
+
 
 
 @api_view(['POST'])
@@ -28,6 +30,21 @@ def create_player_position(request):
     
     else:
         return Response({'message': 'Player position creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_positions(request):
+    """Get all player positions.
+    
+    Args:
+    None.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a list of player positions.
+    """
+    
+    positions = PlayerPosition.objects.all()
+    serializer = PlayerPositionSerializer(positions, many=True)
+    return Response({'data': serializer.data, 'message': 'Player positions retrieved successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -45,6 +62,7 @@ def create_player(request):
     year_group: The year group of the player.
     is_active: A boolean value indicating whether the player is active or not (Optional. Default value is true).
     team: The team the player belongs to. This is a foreign key to the Team model.
+    image: The image of the player (Optional).
     
     
 
@@ -55,8 +73,21 @@ def create_player(request):
     serializer = PlayerSerializer(data=request.data)
         
     if serializer.is_valid():
-        serializer.save()
-        return Response({'message': 'Player created successfully'}, status=status.HTTP_201_CREATED)
+    
+        if request.data.get('featured_image'):
+            
+            image_file = request.data.get('featured_image')
+            
+            cloudinary_response = upload(image_file, folder=settings.CLOUDINARY_PLAYER_IMAGE_FOLDER, api_key=settings.CLOUDINARY_STORAGE['API_KEY'], api_secret=settings.CLOUDINARY_STORAGE['API_SECRET'], cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME'])
+            
+            serializer.validated_data['image'] = cloudinary_response['secure_url']
+            
+            serializer.save()
+            return Response({'message': 'Player created successfully'}, status=status.HTTP_201_CREATED)
+        
+        else:
+            serializer.save()
+            return Response({'message': 'Player created successfully'}, status=status.HTTP_201_CREATED)
     
     else:
         return Response({'message': 'Player creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)

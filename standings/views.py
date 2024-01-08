@@ -264,6 +264,33 @@ def get_season_womens_league_standings(request):
         
     return get_league_standings(season_id, league.id) 
 
+@api_view(['GET'])
+def get_season_standings(request):
+    """Get the standings for a season.
+
+    Args:
+    A JSON request. The request must contain the following fields:
+    season: The season of the standings. This is a foreign key to the Season model.
+    """
+    
+    
+    season_id = request.query_params.get('season_id')
+    
+    if not season_id:
+        return Response({'message': 'Season not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        standings = Standings.objects.filter(
+            season_id=season_id
+        )
+        
+        serializer = StandingsSerializer(standings, many=True)
+        
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'message': 'Standings not found', 'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 def get_team_no_of_wins_in_league_campaign(season_id, team_id, gender):

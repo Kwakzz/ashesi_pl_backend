@@ -36,7 +36,6 @@ class NewsItemSerializer(serializers.ModelSerializer):
         validated_data['title'] = self.strip_html_tags(validated_data['title'])
         validated_data['subtitle'] = self.strip_html_tags(validated_data['subtitle'])
         validated_data['text'] = self.strip_html_tags(validated_data['text'])
-        
         return super().create(validated_data)
         
     

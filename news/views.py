@@ -6,6 +6,9 @@ from rest_framework.decorators import api_view
 from rest_framework.authtoken.models import Token
 from news.models import NewsItem, NewsItemTag
 from news.serializers import NewsItemSerializer, NewsItemTagSerializer
+from cloudinary.uploader import upload
+
+
 
 @api_view(['POST'])
 def create_news_item_tag(request):
@@ -27,6 +30,22 @@ def create_news_item_tag(request):
     
     else:
         return Response({'message': 'News item tag creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+@api_view(['GET'])
+def get_tags(request):
+    """Get all news item tags.
+    
+    Args:
+    None.
+
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of news item tags.
+    """
+    
+    tags = NewsItemTag.objects.all()
+    serializer = NewsItemTagSerializer(tags, many=True)
+    return Response({'message': 'News item tags retrieved successfully', 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -35,7 +54,7 @@ def create_news_item(request):
 
     Args:
     A JSON request. The request must contain the following fields:
-    featured_image: The url of the news item's featured image.
+    featured_image: The bytes stream of the news item's featured image.
     title: The title of the news item.
     subtitle: The subtitle of the news item.
     pub_date: The date of publication of the news item.
@@ -46,13 +65,27 @@ def create_news_item(request):
     """
     
     serializer = NewsItemSerializer(data=request.data)
-        
+    
     if serializer.is_valid():
-        serializer.save()
-        return Response({'message': 'News item created successfully'}, status=status.HTTP_201_CREATED)
+        
+        # Upload the featured image to Cloudinary
+        image_file = request.data.get('featured_image')
+        
+        if not image_file:
+            return Response({'message': 'Featured image is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if image_file:
+        
+            cloudinary_response = upload(image_file, folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, api_key=settings.CLOUDINARY_STORAGE['API_KEY'], api_secret=settings.CLOUDINARY_STORAGE['API_SECRET'], cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME'])
+            
+            serializer.validated_data['featured_image'] = cloudinary_response['secure_url']
+
+            serializer.save()
+
+            return Response({'message': 'News item created successfully'}, status=status.HTTP_201_CREATED)
     
     else:
-        return Response({'message': 'News item creation failed', 'errors': str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'News item creation failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
     
 @api_view(['PATCH'])

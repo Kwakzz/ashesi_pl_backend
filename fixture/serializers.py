@@ -95,6 +95,7 @@ class MatchSerializer(serializers.ModelSerializer):
     referee = serializers.PrimaryKeyRelatedField(queryset=Referee.objects.all(), required=True)
     match_time = serializers.TimeField(required=True)
     
+    
     #ensure home team and away team are different
     # also ensure has_started and has_ended are not set to true if the match day date has not been reached
     def validate(self, data):

@@ -1,5 +1,5 @@
 from django.urls import path
-from news.views import create_news_item, update_news_item, delete_news_item, get_news_items, get_news_item, create_news_item_tag
+from news.views import create_news_item, update_news_item, delete_news_item, get_news_items, get_news_item, create_news_item_tag, get_tags
 
 
 urlpatterns = [
@@ -10,4 +10,5 @@ urlpatterns = [
     path('news-item/get', get_news_item, name='get_news_item'),
     
     path('news-item-tag/create/', create_news_item_tag, name='create_news_item_tag'),
+    path('news-item-tag/get/', get_tags, name='get_tags'),
 ]

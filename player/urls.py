@@ -1,5 +1,5 @@
 from django.urls import path
-from player.views import create_player, update_player, get_players, get_player, create_coach, get_coaches, get_coach, update_coach
+from player.views import create_player, update_player, get_players, get_player, create_coach, get_coaches, get_coach, update_coach, get_positions
 
 
 urlpatterns = [
@@ -13,5 +13,6 @@ urlpatterns = [
     path('coach/get/', get_coaches, name='get_coaches'),
     path('coach/get', get_coach, name='get_coach'),
     
+    path('position/get/', get_positions, name='get_positions'),
     
 ]

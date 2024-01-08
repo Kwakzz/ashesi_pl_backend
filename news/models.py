@@ -1,4 +1,5 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 from django.utils import timezone
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -66,7 +67,7 @@ def create_default_tags(sender, **kwargs):
             
 
 class NewsItem(models.Model):
-    featured_image = models.CharField(max_length=200, null=False, blank=False, default=None)
+    featured_image = CloudinaryField(max_length=200, null=False, blank=False, default=None)
     title = models.TextField(null=False, blank=False)
     subtitle = models.CharField(max_length=200, null=False, blank=False)
     pub_date = models.DateTimeField('date published', default=timezone.now)
