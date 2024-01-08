@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 CORS_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:63220',
+    'http://localhost:49608',
 ]
 
 # Database
@@ -151,10 +151,10 @@ PASSWORD_HASHERS = [
 ]
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'ashesipremierleague01@gmail.com'
-EMAIL_HOST_PASSWORD = 'yfhjpptxryxlxbwl'
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
@@ -191,11 +191,16 @@ AUTH_USER_MODEL = 'account.Fan'
 BACKEND_URL = 'localhost:8000'
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dvghxq3ba',
-    'API_KEY': '758874648176679',
-    'API_SECRET': '427xuqTdqBtXIEt1RgmxpSkR6Qg',
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+    'API_KEY': os.environ.get('API_KEY'),
+    'API_SECRET': os.environ.get('API_SECRET'),
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_NEWS_IMAGE_FOLDER = 'News Cover Pics'
 CLOUDINARY_PLAYER_IMAGE_FOLDER = "Player Images"
+
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_BROWSER_XSS_FILTER = True

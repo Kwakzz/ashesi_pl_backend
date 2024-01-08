@@ -25,4 +25,5 @@ urlpatterns = [
     path('', include('fixture.urls')),
     path('', include('stats.urls')),
     path('', include('standings.urls')),
+    path('', include('transfer.urls')),
 ]
