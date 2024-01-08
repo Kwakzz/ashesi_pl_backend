@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+
+#load env library
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -93,7 +98,7 @@ WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 CORS_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:60104',
+    'http://localhost:63220',
 ]
 
 # Database
@@ -103,14 +108,16 @@ CORS_ALLOWED_ORIGINS = [
 import pymysql
 pymysql.install_as_MySQLdb()
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'apl',
-        'USER': 'root',
-        'PASSWORD': 'Mariamjade1@',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
+
     }
 }
 

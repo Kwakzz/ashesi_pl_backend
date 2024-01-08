@@ -1,10 +1,9 @@
 django-rest-framework
 django
-paystack
 pymysql
 firebase-admin
 Pillow
 corsheaders
 cloudinary
 django-cloudinary-storage
-```
+python-dotenv==1.0.0
