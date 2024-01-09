@@ -1,14 +1,15 @@
 from django.db import models
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+from cloudinary.models import CloudinaryField
 
 
 class Team(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, null=False, blank=False, default=None, unique=True)
     name_abbreviation = models.CharField(max_length=5, blank=False, null=False, default=None, unique=True)
-    logo_url = models.URLField(max_length=200, null=False, blank=False, default=None)
-    cover_photo_url = models.URLField(max_length=250, null=False, blank=False, default=None)
+    logo_url = CloudinaryField(max_length=200, null=False, blank=False, default=None)
+    cover_photo_url = CloudinaryField(max_length=250, null=False, blank=False, default=None)
     color = models.CharField(max_length=20, null=False, blank=False, default=None)
     twitter_url = models.URLField(max_length=100, null=False, blank=False, default=None, unique=True,)
     is_active = models.BooleanField(default=True)

@@ -8,6 +8,11 @@ class TransferSerializer(serializers.ModelSerializer):
         model = Transfer
         fields = '__all__'
         
+    # set the from team to player's current team
+    def create(self, validated_data):
+        validated_data['from_team'] = validated_data['player'].team
+        return super().create(validated_data)
+        
     def to_representation(self, instance):
         # When retrieving a transfer, include the player, from_team and to_team associated with the transfer.
         representation = super().to_representation(instance)
@@ -18,6 +23,7 @@ class TransferSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         # A player cannot be transferred to the same team he/she is already in
-        if data['from_team'] == data['to_team']:
+        if data['player'].team.id == data['to_team'].id:
             raise serializers.ValidationError('A player cannot be transferred to the same team he/she is already in')
+        
         return data

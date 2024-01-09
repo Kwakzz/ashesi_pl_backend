@@ -92,8 +92,8 @@ def get_teams(request):
             'id': team.id,
             'name': team.name,
             'name_abbreviation': team.name_abbreviation,
-            'logo_url': team.logo_url,
-            'cover_photo_url': team.cover_photo_url,
+            'logo_url': team.logo_url.url if team.logo_url else '',  # Extract URL from CloudinaryResource
+            'cover_photo_url': team.cover_photo_url.url if team.cover_photo_url else '',  # Extract URL from CloudinaryResource
             'color': team.color,
             'twitter_url': team.twitter_url,
             'has_womens_team': team in womens_teams,

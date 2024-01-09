@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from player.models import Player, PlayerPosition
 from player.serializers import PlayerSerializer, PlayerPositionSerializer
+from team.models import Team
 from transfer.models import Transfer
 from transfer.serializers import TransferSerializer
 
@@ -30,7 +31,8 @@ def create_transfer(request):
         
         # Update the player's team
         player = Player.objects.get(id=request.data['player'])
-        player.team = serializer.data['to_team']
+        to_team = Team.objects.get(id=request.data['to_team'])
+        player.team = to_team
         player.save()
         
         return Response({'message': 'Transfer created successfully'}, status=status.HTTP_201_CREATED)
