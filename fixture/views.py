@@ -643,18 +643,14 @@ def create_goal(request):
     if scoring_team != match.home_team and scoring_team != match.away_team:
         return Response({'message': 'Scoring team is not playing in the match'}, status=status.HTTP_400_BAD_REQUEST)
     
-    match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type='Goal')
+    match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, team=scoring_team, event_type='Goal')
     
-    goal = Goal.objects.create(match_event=match_event, scoring_team=scoring_team, assist_provider=assist_provider)
+    goal = Goal.objects.create(match_event=match_event, assist_provider=assist_provider)
     
-    # Update the match score
-    if scoring_team.id == match.home_team.id:
-        match.home_team_score += 1
-    else:
-        match.away_team_score += 1
-        
+    match.home_team_score = Goal.objects.filter(match_event__match=match, match_event__team=match.home_team).count()
+    match.away_team_score = Goal.objects.filter(match_event__match=match, match_event__team=match.away_team).count()
     match.save()
-    
+            
     return Response({'message': 'Goal created successfully'}, status=status.HTTP_201_CREATED)
     
         
@@ -758,7 +754,7 @@ def get_team_match_events(request):
     except Team.DoesNotExist:
         return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    match_events = MatchEvent.objects.filter(match=match, player__team=team)
+    match_events = MatchEvent.objects.filter(match=match, team=team)
     serializer = MatchEventSerializer(match_events, many=True)
     return Response({'data': serializer.data, 'message': 'Match events retrieved successfully'}, status=status.HTTP_200_OK)
 
@@ -902,16 +898,18 @@ def create_match_event(request, event_type):
     
     data = request.data
     
-    if not data.get('match') or not data.get('player') or not data.get('minute'):
-        return Response({'message': 'Match, player and minute are required'}, status=status.HTTP_400_BAD_REQUEST)
+    if not data.get('match') or not data.get('player') or not data.get('minute') or not data.get('team'):
+        return Response({'message': 'Match, player, team and minute are required'}, status=status.HTTP_400_BAD_REQUEST)
         
     player = data.get('player')
     match = data.get('match')
     minute = data.get('minute')
+    team = data.get('team')
     
-    # obtain the match and player objects
+    # obtain the match, team and player objects
     match = Match.objects.get(id=match)
     player = Player.objects.get(id=player)
+    team = Team.objects.get(id=team)
     
     if not match:
         return Response({'message': 'Match not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -919,11 +917,17 @@ def create_match_event(request, event_type):
     if not player:
         return Response({'message': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)
     
+    if not team:
+        return Response({'message': 'Team not found'}, status=status.HTTP_404_NOT_FOUND)
+    
     if not match.has_started:
         return Response({'message': 'Match has not started yet'}, status=status.HTTP_400_BAD_REQUEST)
     
     if match.has_ended:
         return Response({'message': 'Match has ended'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if team != match.home_team and team != match.away_team:
+        return Response({'message': 'Team is not playing in the match'}, status=status.HTTP_400_BAD_REQUEST)
     
     if player.team != match.home_team and player.team != match.away_team:
         return Response({'message': 'Player is not playing in the match'}, status=status.HTTP_400_BAD_REQUEST)
@@ -931,6 +935,6 @@ def create_match_event(request, event_type):
     if player.gender != match.competition.gender:
         return Response({'message': 'Player is not playing in the competition'}, status=status.HTTP_400_BAD_REQUEST)
     
-    match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type=event_type)
+    match_event = MatchEvent.objects.create(match=match, player=player, minute=minute, event_type=event_type, team=team)
     
     return Response({'message': event_type + ' event created successfully'}, status=status.HTTP_201_CREATED)

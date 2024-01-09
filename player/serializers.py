@@ -31,7 +31,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         # Extract the URL part from the "image" field
         if 'image' in representation and representation['image'] is not None:
             player_image = representation.get('image', '')
-            representation['image'] = self.extract_image_url(player_image)
+            representation['image'] = representation['image'].url
         
         # get no of goals scored in history
         goals = Goal.objects.filter(match_event__player=instance)

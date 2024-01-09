@@ -130,6 +130,7 @@ class MatchEvent(models.Model):
     match = models.ForeignKey(Match, on_delete=models.SET_DEFAULT, related_name='events', null=True, blank=True, default=None)
     event_type = models.CharField(max_length=50, null=False, blank=False, default=None, choices=EVENT_TYPE_CHOICES)
     player = models.ForeignKey('player.Player', on_delete=models.SET_DEFAULT, related_name='events', null=True, blank=True, default=None)
+    team = models.ForeignKey('team.Team', on_delete=models.SET_DEFAULT, related_name='events', null=False, blank=False, default=None)
     minute = models.IntegerField(null=False, blank=False)
     
     def __str__(self):
@@ -141,7 +142,7 @@ class MatchEvent(models.Model):
 
 class Goal(models.Model):
     match_event = models.OneToOneField(MatchEvent, on_delete=models.CASCADE, related_name='goal')
-    scoring_team = models.ForeignKey('team.Team', on_delete=models.SET_DEFAULT, related_name='scored_goals', null=True, blank=True, default=None)
+    # scoring_team = models.ForeignKey('team.Team', on_delete=models.SET_DEFAULT, related_name='scored_goals', null=True, blank=True, default=None)
     assist_provider = models.ForeignKey('player.Player', on_delete=models.SET_DEFAULT, related_name='assists', null=True, blank=True, default=None)
     
     def __str__(self):

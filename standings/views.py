@@ -370,7 +370,7 @@ def get_team_no_of_goals_scored_in_league_campaign_(season_id, team_id, gender):
     )
 
     no_of_goals_scored = Goal.objects.filter(
-            Q(scoring_team=team) &
+            Q(match_event__team=team) &
             Q(match_event__match__competition = competition, match_event__match__match_day__season=season)
         ).count()
 
@@ -579,7 +579,7 @@ def get_team_no_of_goals_scored_in_fa_cup_group_stage(season_id, team_id, gender
     )
 
     no_of_goals_scored = Goal.objects.filter(
-            Q(scoring_team=team) &
+            Q(match_event__team=team) &
             Q(match_event__match__competition__name="FA Cup", match_event__match__competition=competition, match_event__match__match_day__season=season, match_event__match__stage=stage)
         ).count()
 

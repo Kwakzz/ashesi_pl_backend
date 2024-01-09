@@ -187,15 +187,17 @@ def get_season_top_scorers(season_id_arg, gender):
                 'position': goal.match_event.player.position.name,
                 'team_name': goal.match_event.player.team.name,
                 'team_name_abbreviation': goal.match_event.player.team.name_abbreviation,
-                'team_logo_url': goal.match_event.player.team.logo_url,
+                'team_logo_url': goal.match_event.player.team.logo_url.url,
                 'team_color': goal.match_event.player.team.color,
                 'player_id': goal.match_event.player.id,
-                'player_image': goal.match_event.player.image,
                 'no_of_goals': Goal.objects.filter(
                     Q(match_event__player=goal.match_event.player),
                     Q(match_event__match__match_day__season=season)
                 ).count()
             }
+            if goal.match_event.player.image is not None:
+                scorer_data['player_image'] = goal.match_event.player.image.url
+                
             if scorer_data not in scorers:
                 scorers.append(scorer_data)
         
@@ -252,15 +254,17 @@ def get_season_top_assisters(season_id_arg, gender):
                 'position': goal.assist_provider.position.name,
                 'team_name': goal.assist_provider.team.name,
                 'team_name_abbreviation': goal.assist_provider.team.name_abbreviation,
-                'team_logo_url': goal.assist_provider.team.logo_url,
+                'team_logo_url': goal.assist_provider.team.logo_url.url,
                 'team_color': goal.assist_provider.team.color,
                 'player_id': goal.assist_provider.id,
-                'player_image': goal.assist_provider.image,
                 'no_of_assists': Goal.objects.filter(
                     Q(assist_provider=goal.assist_provider),
                     Q(match_event__match__match_day__season=season)
                 ).count()
             }
+            
+            if goal.assist_provider.image is not None:
+                assister_data['player_image'] = goal.assist_provider.image.url
             if assister_data not in assisters:
                 assisters.append(assister_data)
         
@@ -317,7 +321,7 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
             clean_sheet_ranking_data = {
                 'team_name': clean_sheet.away_team.name,
                 'team_name_abbreviation': clean_sheet.away_team.name_abbreviation,
-                'team_logo_url': clean_sheet.away_team.logo_url,
+                'team_logo_url': clean_sheet.away_team.logo_url.url,
                 'team_color': clean_sheet.away_team.color,
                 'no_of_clean_sheets': Match.objects.filter(
                     Q(away_team=clean_sheet.away_team) &
@@ -333,7 +337,7 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
             clean_sheet_ranking_data = {
                 'team_name': clean_sheet.away_team.name,
                 'team_name_abbreviation': clean_sheet.home_team.name_abbreviation,
-                'team_logo_url': clean_sheet.home_team.logo_url,
+                'team_logo_url': clean_sheet.home_team.logo_url.url,
                 'team_color': clean_sheet.home_team.color,
                 'no_of_clean_sheets': Match.objects.filter(
                     Q(home_team=clean_sheet.home_team) &
@@ -395,16 +399,17 @@ def get_season_card_rankings(season_id_arg, gender, card_type):
             'position': card.player.position.name,
             'team_name': card.player.team.name,
             'team_name_abbreviation': card.player.team.name_abbreviation,
-            'team_logo_url': card.player.team.logo_url,
+            'team_logo_url': card.player.team.logo_url.url,
             'team_color': card.player.team.color,
             'player_id': card.player.id,
-            'player_image': card.player.image,
             'no_of_cards': MatchEvent.objects.filter(
                 Q(player=card.player) &
                 Q(match__match_day__season=season) &
                 Q(event_type=card_type)
             ).count()
         }
+        if card.player.image is not None:
+            card_ranking_data['player_image'] = card.player.image.url
         if card_ranking_data not in card_rankings:
             card_rankings.append(card_ranking_data)
         

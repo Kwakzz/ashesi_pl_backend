@@ -148,11 +148,11 @@ class MatchEventSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['match'] = MatchSerializer(instance.match).data
         representation['player'] = PlayerSerializer(instance.player).data
+        representation['team'] = TeamSerializer(instance.team).data
         
         if instance.event_type == 'Goal':
             # Check if there is a related goal and include additional fields
             if hasattr(instance, 'goal'):
-                representation['scoring_team'] = TeamSerializer(instance.goal.scoring_team).data
                 if instance.goal.assist_provider:
                     representation['assist_provider'] = PlayerSerializer(instance.goal.assist_provider).data
         
@@ -166,6 +166,8 @@ class GoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
         fields = '__all__'
+        
+    
         
     def to_representation(self, instance):
         # When retrieving a goal, include the match event, scoring team and assist provider associated with the goal.
@@ -206,28 +208,6 @@ class StartingXISerializer(serializers.ModelSerializer):
         
         return representation
     
-
-
-        
-    
-class MatchEventWithSubstitutionSerializer(serializers.ModelSerializer):
-            
-    class Meta:
-        model = MatchEvent
-        fields = '__all__'
-        
-    def to_representation(self, instance):
-        # When retrieving a match event, include the match, player and substitution associated with the match event.
-        representation = super().to_representation(instance)
-        representation['match'] = MatchSerializer(instance.match).data
-        representation['player'] = TeamSerializer(instance.player).data
-        
-        # Conditionally include 'substitution' only if it's not None
-        if instance.substitution:
-            representation['substitution'] = SubstitutionSerializer(instance.substitution).data
-        else:
-            representation['substitution'] = None
-        return representation
         
 
 class ManOfTheMatchSerializer (serializers.ModelSerializer):
