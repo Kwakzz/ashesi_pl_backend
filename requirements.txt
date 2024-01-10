@@ -10,3 +10,4 @@ python-dotenv==1.0.0
 gunicorn==21.2.0
 dj-database-url
 psycopg2
+bleach
