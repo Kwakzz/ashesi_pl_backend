@@ -193,7 +193,7 @@ MEDIA_URL = "/media/"
 
 AUTH_USER_MODEL = 'account.Fan'
 
-BACKEND_URL = 'localhost:8000'
+BACKEND_URL = 'apl-api-891b613e07a6.herokuapp.com'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
