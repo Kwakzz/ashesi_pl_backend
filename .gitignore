@@ -1,6 +1,4 @@
 .env
 # Ignore all files in the 'migrations' folders within Django apps
-**/migrations/*
-!**/migrations/__init__.py
 __pycache__/
 *.pyc
