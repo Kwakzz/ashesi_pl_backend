@@ -1,0 +1,1 @@
+web: gunicorn ashesi_premier_league.wsgi
