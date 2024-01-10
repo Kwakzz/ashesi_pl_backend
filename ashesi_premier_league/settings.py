@@ -98,9 +98,9 @@ WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 
 CORS_ALLOW_ALL = True
 
-CORS_ALLOWED_ORIGINS = [
-    '*'
-]
+# CORS_ALLOWED_ORIGINS = [
+#     '*'
+# ]
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
