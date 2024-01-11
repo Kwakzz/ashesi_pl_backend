@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 
 #load env library
@@ -31,7 +32,9 @@ SECRET_KEY = 'django-insecure-u8yf91ekro16$hl3s10-@x)955l)t6$4cihm8=3105s@6h0*)7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    os.environ.get('ALLOWED_HOST'),
+]
 
 
 # Application definition
@@ -98,7 +101,7 @@ WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 CORS_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:49608',
+    os.environ.get('ADMIN_URL'),     
 ]
 
 # Database
@@ -109,16 +112,20 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
 
-    }
+#     }
+# }
+
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('JAWSDB_URL'))
 }
 
 
@@ -175,7 +182,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -188,7 +195,7 @@ MEDIA_URL = "/media/"
 
 AUTH_USER_MODEL = 'account.Fan'
 
-BACKEND_URL = 'localhost:8000'
+BACKEND_URL = os.environ.get('BACKEND_URL')
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
@@ -200,7 +207,10 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_NEWS_IMAGE_FOLDER = 'News Cover Pics'
 CLOUDINARY_PLAYER_IMAGE_FOLDER = "Player Images"
 
-# SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_BROWSER_XSS_FILTER = True
+
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
-# SECURE_BROWSER_XSS_FILTER = True
