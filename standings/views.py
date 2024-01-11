@@ -197,6 +197,33 @@ def get_season_mens_fa_cup_group_standings(request):
         return Response({'message': 'An error occurred', 'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
         
 
+@api_view(['GET'])
+def get_season_standings(request):
+    """Get the standings for a season.
+
+    Args:
+    A JSON request. The request must contain the following fields:
+    season: The season of the standings. This is a foreign key to the Season model.
+    """
+    
+    
+    season_id = request.query_params.get('season_id')
+    
+    if not season_id:
+        return Response({'message': 'Season not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        standings = Standings.objects.filter(
+            season_id=season_id
+        )
+        
+        serializer = StandingsSerializer(standings, many=True)
+        
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'message': 'Standings not found', 'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 def get_league_standings(season_id, competition_id):
     """Get the standings for a season and competition. This is a helper function.
@@ -792,3 +819,28 @@ def get_season_mens_fa_cup_group_standings_helper(season_id):
     
     except Exception as e:
         return Response({'message': 'An error occurred', 'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['DELETE'])
+def delete_standings(request, standings_id):
+    """Delete the standings for a season and competition. This is a helper function. It finds the standings for the season and competition, and deletes them.
+    
+    Args:
+    season_id: The season of the standings. This is a foreign key to the Season model.
+    competition_id: The competition of the standings. This is a foreign key to the Competition model.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Standings deleted successfully' or 'Standings deletion failed'.
+    """
+    
+    try:
+        standings = Standings.objects.get(
+            id=standings_id
+        )  
+        
+        standings.delete()
+        
+        return Response({'message': 'Standings deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'message': 'Standings deletion failed', 'errors': str(e)}, status=status.HTTP_400_BAD_REQUEST)
