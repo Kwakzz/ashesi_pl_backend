@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from news.models import NewsItem, NewsItemTag
 from news.serializers import NewsItemSerializer, NewsItemTagSerializer
 from cloudinary.uploader import upload
+import os
 
 
 
