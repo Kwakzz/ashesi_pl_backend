@@ -792,3 +792,30 @@ def get_season_mens_fa_cup_group_standings_helper(season_id):
     
     except Exception as e:
         return Response({'message': 'An error occurred', 'errors': str(e)}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['DELETE'])
+def delete_standings(request, standings_id):
+    """Delete the standings for a season and competition. This is a helper function. It finds the standings for the season and competition, and deletes them.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    season: The season of the standings. This is a foreign key to the Season model.
+    competition: The competition of the standings. This is a foreign key to the Competition model.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'Standings deleted successfully' or 'Standings deletion failed'.
+    """
+    
+    try:
+        standings = Standings.objects.get(id=standings_id)
+        
+        if not standings:
+            return Response({'message': 'Standings not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        standings.delete()
+        
+        return Response({'message': 'Standings deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'message': 'Standings deletion failed', 'errors': str(e)}, status=status.HTTP_400_BAD_REQUEST)
