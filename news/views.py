@@ -65,34 +65,38 @@ def create_news_item(request):
         A response object containing a JSON object and a status code. The JSON object contains a message and a list of errors if any. The message is either 'News item created successfully' or 'News item creation failed'.
     """
     
-    serializer = NewsItemSerializer(data=request.data)
-    
-    if serializer.is_valid():
+    try:
+        serializer = NewsItemSerializer(data=request.data)
         
-        # Upload the featured image to Cloudinary
-        image_file = request.data.get('featured_image')
-        
-        if not image_file:
-            return Response({'message': 'Featured image is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if image_file:
-        
-            cloudinary_response = upload(
-                image_file, 
-                folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, 
-                api_key=os.environ.get('CLOUDINARY_API_KEY'), 
-                api_secret=os.environ.get('CLOUDINARY_API_SECRET'), 
-                cloud_name=os.environ.get('CLOUD_NAME')
-            )
+        if serializer.is_valid():
             
-            serializer.validated_data['featured_image'] = cloudinary_response['secure_url']
+            # Upload the featured image to Cloudinary
+            image_file = request.data.get('featured_image')
+            
+            if not image_file:
+                return Response({'message': 'Featured image is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if image_file:
+            
+                cloudinary_response = upload(
+                    image_file, 
+                    folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, 
+                    api_key=settings.CLOUDINARY_API_KEY,
+                    api_secret=settings.CLOUDINARY_API_SECRET,
+                    cloud_name=settings.CLOUD_NAME
+                )
+                
+                serializer.validated_data['featured_image'] = cloudinary_response['secure_url']
 
-            serializer.save()
+                serializer.save()
 
-            return Response({'message': 'News item created successfully'}, status=status.HTTP_201_CREATED)
+                return Response({'message': 'News item created successfully'}, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response({'message': 'News item creation failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
-    else:
-        return Response({'message': 'News item creation failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'message': 'News item creation failed', 'errors': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     
 @api_view(['PATCH'])
