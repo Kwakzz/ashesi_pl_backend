@@ -1,3 +1,4 @@
+import os
 from django.utils import timezone
 from django.conf import settings
 from rest_framework import status
@@ -76,7 +77,13 @@ def create_news_item(request):
         
         if image_file:
         
-            cloudinary_response = upload(image_file, folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, api_key=settings.CLOUDINARY_STORAGE['API_KEY'], api_secret=settings.CLOUDINARY_STORAGE['API_SECRET'], cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME'])
+            cloudinary_response = upload(
+                image_file, 
+                folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, 
+                api_key=os.environ.get('CLOUDINARY_API_KEY'), 
+                api_secret=os.environ.get('CLOUDINARY_API_SECRET'), 
+                cloud_name=os.environ.get('CLOUD_NAME')
+            )
             
             serializer.validated_data['featured_image'] = cloudinary_response['secure_url']
 
