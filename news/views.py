@@ -79,11 +79,10 @@ def create_news_item(request):
             if image_file:
             
                 cloudinary_response = upload(
-                    image_file, 
-                    folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, 
-                    api_key=settings.CLOUDINARY_API_KEY,
-                    api_secret=settings.CLOUDINARY_API_SECRET,
-                    cloud_name=settings.CLOUD_NAME
+                    image_file, folder=settings.CLOUDINARY_NEWS_IMAGE_FOLDER, 
+                    api_key=settings.CLOUDINARY_STORAGE['API_KEY'], 
+                    api_secret=settings.CLOUDINARY_STORAGE['API_SECRET'], 
+                    cloud_name=settings.CLOUDINARY_STORAGE['CLOUD_NAME']
                 )
                 
                 serializer.validated_data['featured_image'] = cloudinary_response['secure_url']
