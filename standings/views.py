@@ -746,8 +746,12 @@ def get_latest_mens_standings(request):
     """
     
     latest_season = Season.objects.latest('start_date')
+    premier_league_comp = Competition.objects.get(
+        name = 'Premier League',
+        gender = 'M'
+    )
     
-    league_standings = get_league_standings(latest_season.id, 'M')
+    league_standings = get_league_standings(latest_season.id, premier_league_comp.id)
     fa_cup_standings = get_season_mens_fa_cup_group_standings_helper(latest_season.id)
     
     if league_standings.status_code == 404:
