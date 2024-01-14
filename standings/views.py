@@ -462,8 +462,8 @@ def get_team_no_of_league_matches_played(season_id, team_id, gender):
     )
 
     no_of_league_matches_played = Match.objects.filter(
-        Q(match_day__season=season, competition=competition, home_team=team) |
-        Q(match_day__season=season, competition=competition, away_team=team)
+        Q(match_day__season=season, competition=competition, home_team=team, has_ended=True) |
+        Q(match_day__season=season, competition=competition, away_team=team, has_ended=True)
     ).count()
         
 
