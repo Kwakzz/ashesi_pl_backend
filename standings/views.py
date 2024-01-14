@@ -462,8 +462,8 @@ def get_team_no_of_league_matches_played(season_id, team_id, gender):
     )
 
     no_of_league_matches_played = Match.objects.filter(
-        Q(match_day__season=season, competition=competition, home_team=team, has_ended=True) |
-        Q(match_day__season=season, competition=competition, away_team=team, has_ended=True)
+        Q(match_day__season=season, competition=competition, home_team=team, has_started=True) |
+        Q(match_day__season=season, competition=competition, away_team=team, has_started=True)
     ).count()
         
 
@@ -675,8 +675,8 @@ def get_team_no_of_fa_cup_group_stage_matches_played(season_id, team_id, gender)
     )
 
     no_of_fa_cup_group_matches_played = Match.objects.filter(
-        Q(match_day__season=season, competition=competition, home_team=team, stage=stage) |
-        Q(match_day__season=season, competition=competition, away_team=team, stage=stage)
+        Q(match_day__season=season, competition=competition, home_team=team, stage=stage, has_started=True) |
+        Q(match_day__season=season, competition=competition, away_team=team, stage=stage, has_started=True)
     ).count()
         
 
