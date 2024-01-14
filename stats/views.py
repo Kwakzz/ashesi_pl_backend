@@ -307,7 +307,8 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
     clean_sheets = Match.objects.filter(
         Q(match_day__season=season) &
         (Q(home_team_score=0) | Q(away_team_score=0)) &
-        Q(competition__gender=gender) 
+        Q(competition__gender=gender) & 
+        Q(has_ended=True)
     )
     
     if not clean_sheets:
@@ -327,7 +328,8 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
                     Q(away_team=clean_sheet.away_team) &
                     Q(home_team_score=0) &
                     Q(match_day__season=season) &
-                    Q(competition__gender = gender)
+                    Q(competition__gender = gender) &
+                    Q(has_ended=True)
                 ).count()
             }
             if clean_sheet_ranking_data not in clean_sheet_rankings:
@@ -335,7 +337,7 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
                 
         if clean_sheet.away_team_score == 0:
             clean_sheet_ranking_data = {
-                'team_name': clean_sheet.away_team.name,
+                'team_name': clean_sheet.home_team.name,
                 'team_name_abbreviation': clean_sheet.home_team.name_abbreviation,
                 'team_logo_url': clean_sheet.home_team.logo_url.url,
                 'team_color': clean_sheet.home_team.color,
@@ -343,7 +345,8 @@ def get_season_clean_sheet_rankings(gender, season_id_arg):
                     Q(home_team=clean_sheet.home_team) &
                     Q(away_team_score=0) &
                     Q(match_day__season=season) &
-                    Q(competition__gender = gender)
+                    Q(competition__gender = gender) &
+                    Q(has_ended=True)
                 ).count()
             }
             if clean_sheet_ranking_data not in clean_sheet_rankings:
