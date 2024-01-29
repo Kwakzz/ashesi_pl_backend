@@ -673,6 +673,49 @@ def create_red_card_event(request):
     return create_match_event(request, 'Red Card')
 
 
+
+@api_view(['DELETE'])
+def delete_goal(request, id):
+    """
+    This function deletes a goal. Its argument is a JSON request which is deserialized into a django model.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    id: The id of the goal to be deleted.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message. The message is either 'Goal deleted successfully' or 'Goal deletion failed'.
+    """
+    goal = Goal.objects.get(id=id)
+    
+    try:
+        if not goal:
+            return Response({'message': 'Goal not found', 'status':status.HTTP_404_NOT_FOUND})
+        
+        match_event = goal.match_event
+        match = goal.match_event.match
+        
+        # get team that scored the goal
+        scoring_team = goal.match_event.team
+        
+        if scoring_team == match.home_team:
+            match.home_team_score -= 1
+        else:
+            match.away_team_score -= 1
+        
+        match.save()
+        
+        # delete the goal and the match event
+        goal.delete()
+        match_event.delete()
+        
+        return Response({'message': 'Goal deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except:
+        return Response({'message': 'Goal deletion failed'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
 @api_view(['POST'])
 def create_yellow_card_event(request):
     """Create a new yellow card event. Its argument is a JSON request which is deserialized into a django model.
