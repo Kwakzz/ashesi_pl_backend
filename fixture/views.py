@@ -652,7 +652,26 @@ def create_goal(request):
     match.save()
             
     return Response({'message': 'Goal created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def delete_goal(request):
+    """
+    This function deletes a goal. Its argument is a JSON request which is deserialized into a django model.
     
+    Args:
+    A JSON request. The request must contain the following fields:
+    id: The id of the goal to be deleted.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message. The message is either 'Goal deleted successfully' or 'Goal deletion failed'.
+    """
+    id = request.query_params.get('id')
+    goal = Goal.objects.get(id=id)
+    match = goal.match_event.match
+    
+    # get team that scored the goal
+    scoring_team = goal.match_event.team
         
         
 @api_view(['POST'])
