@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'ashesi_premier_league.wsgi.application'
 CORS_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:53953',
+    'http://localhost:53658',
 ]
 
 # Database
