@@ -652,6 +652,54 @@ def create_goal(request):
     match.save()
             
     return Response({'message': 'Goal created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def delete_match_event(request, id):
+    """
+    This function deletes a match event. Its argument is a JSON request which is deserialized into a django model.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    id: The id of the match event to be deleted.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message. The message is either 'Match event deleted successfully' or 'Match event deletion failed'.
+    """
+    match_event = MatchEvent.objects.get(id=id)
+    
+    try:
+        if not match_event:
+            return Response({'message': 'Match event not found', 'status':status.HTTP_404_NOT_FOUND})
+        
+        if match_event.event_type == 'Goal':
+            # get the goal
+            goal = Goal.objects.get(match_event=match_event)
+            
+            if not goal:
+                return Response({'message': 'Goal not found', 'status':status.HTTP_404_NOT_FOUND})
+            
+            # get the match
+            match = match_event.match
+            
+            # get team that scored the goal
+            scoring_team = goal.match_event.team
+            
+            if scoring_team == match.home_team:
+                match.home_team_score -= 1
+            else:
+                match.away_team_score -= 1
+            
+            match.save()
+        
+        # delete the match event
+        match_event.delete()
+        
+        return Response({'message': 'Match Event deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except:
+        return Response({'message': 'Match Event deletion failed'}, status=status.HTTP_400_BAD_REQUEST)
+    
     
         
         
@@ -671,49 +719,6 @@ def create_red_card_event(request):
     """
     
     return create_match_event(request, 'Red Card')
-
-
-
-@api_view(['DELETE'])
-def delete_goal(request, id):
-    """
-    This function deletes a goal. Its argument is a JSON request which is deserialized into a django model.
-    
-    Args:
-    A JSON request. The request must contain the following fields:
-    id: The id of the goal to be deleted.
-    
-    Returns:
-        A response object containing a JSON object and a status code. The JSON object contains a message. The message is either 'Goal deleted successfully' or 'Goal deletion failed'.
-    """
-    goal = Goal.objects.get(id=id)
-    
-    try:
-        if not goal:
-            return Response({'message': 'Goal not found', 'status':status.HTTP_404_NOT_FOUND})
-        
-        match_event = goal.match_event
-        match = goal.match_event.match
-        
-        # get team that scored the goal
-        scoring_team = goal.match_event.team
-        
-        if scoring_team == match.home_team:
-            match.home_team_score -= 1
-        else:
-            match.away_team_score -= 1
-        
-        match.save()
-        
-        # delete the goal and the match event
-        goal.delete()
-        match_event.delete()
-        
-        return Response({'message': 'Goal deleted successfully'}, status=status.HTTP_200_OK)
-    
-    except:
-        return Response({'message': 'Goal deletion failed'}, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 @api_view(['POST'])
@@ -831,6 +836,7 @@ def get_goals_in_match(request):
     goals = Goal.objects.filter(match_event__match=match)
     serializer = GoalSerializer(goals, many=True)
     return Response({'data': serializer.data, 'message': 'Goals retrieved successfully'}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def get_goals_in_match_by_team(request):
