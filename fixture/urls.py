@@ -1,5 +1,5 @@
 from django.urls import path
-from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, get_latest_results, create_match, get_matches, get_match, update_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_team_match_events, get_goals_in_match, get_goals_in_match_by_team, delete_match_event, get_competitions, get_stages
+from fixture.views import create_referee, create_season, get_seasons, update_season, get_referees, get_season, get_referee, create_match_day, get_match_days, get_match_day, update_match_day, get_match_day_matches, get_season_match_days, get_season_fixtures, get_season_results, get_latest_results, create_match, get_matches, get_match, update_match, delete_match, create_goal, create_yellow_card_event, create_red_card_event, get_match_events_in_match, get_team_match_events, get_goals_in_match, get_goals_in_match_by_team, delete_match_event, get_competitions, get_stages
 
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     path('match/get/', get_matches, name='get_matches'),
     path('match/get', get_match, name='get_match'),
     path('match/update/<int:id>/', update_match, name='update_match'),
+    path('match/delete/<int:id>/', delete_match, name='delete_match'),
     
     path('match_event/goal/create/', create_goal, name='create_goal'),
     path('match_event/yellow_card/create/', create_yellow_card_event, name='create_yellow_card_event'),

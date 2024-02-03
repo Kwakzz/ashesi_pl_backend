@@ -571,6 +571,30 @@ def update_match(request, id):
     else:
         return Response({'message': 'Match update failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['DELETE'])
+def delete_match(request, id):
+    """
+    This function deletes a match. Its argument is a JSON request which is deserialized into a django model.
+    
+    Args:
+    A JSON request. The request must contain the following fields:
+    id: The id of the match to be deleted.
+    
+    Returns:
+        A response object containing a JSON object and a status code. The JSON object contains a message. The message is either 'Match deleted successfully' or 'Match deletion failed'.
+    """
+    match = Match.objects.get(id=id)
+    
+    try:
+        if not match:
+            return Response({'message': 'Match not found', 'status':status.HTTP_404_NOT_FOUND})
+        
+        match.delete()
+        
+        return Response({'message': 'Match deleted successfully'}, status=status.HTTP_200_OK)
+    
+    except:
+        return Response({'message': 'Match deletion failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 # MATCH EVENT VIEWS
 @api_view(['POST'])
