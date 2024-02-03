@@ -31,8 +31,8 @@ class SeasonSerializer(serializers.ModelSerializer):
         if start_date and end_date:
             if start_date >= end_date:
                 raise serializers.ValidationError({'start_date': 'Start date must be before end date.'})
-            if start_date < timezone.now().date():
-                raise serializers.ValidationError({'start_date': 'Start date cannot be before today.'})
+            # if start_date < timezone.now().date():
+            #     raise serializers.ValidationError({'start_date': 'Start date cannot be before today.'})
 
         return data
 
