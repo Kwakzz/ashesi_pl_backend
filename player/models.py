@@ -12,7 +12,6 @@ class PlayerPosition(models.Model):
         return self.name
     
     
-# Define default positions
 DEFAULT_POSITIONS = [
     {'name': 'Forward', 'name_abbreviation': 'FWD'},
     {'name': 'Midfielder', 'name_abbreviation': 'MID'},
